@@ -1,0 +1,54 @@
+{% extends 'company_templates/baseComp.html' %}
+
+{% block title %}Response to Posts{% endblock %}
+
+{% block styles %}
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Add your custom styles here -->
+  <style>
+    .resume-card {
+      margin-bottom: 20px;
+      box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
+      padding: 20px;
+    }
+
+    .resume-card h4 {
+      margin-top: 0;
+    }
+
+    .resume-card p {
+      margin-bottom: 0;
+    }
+
+    .resume-card .resume-details {
+      margin-top: 10px;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h1>Response to "{{ job_post.title }}"</h1>
+    <div class="row mt-4">
+      {% for shortlisted_resume in shortlisted_resumes %}
+        <div class="col-md-6">
+          <div class="card resume-card">
+            <div class="card-body">
+              <h4 class="card-title">{{ shortlisted_resume.resume_id.name }}</h4>
+              <p class="card-text">Contact: </p>
+              <div class="resume-details">
+                  <p>Score: {{ shortlisted_resume.resume_score }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <!-- Bootstrap JS -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock %}
