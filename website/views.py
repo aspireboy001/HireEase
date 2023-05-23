@@ -430,8 +430,9 @@ def send_resumes(request, job_id):
 
             contact_info = "Not Exist"
             if contact_details:
-                contact_info = contact_details.get('email') or contact_details.get('phone')
+                contact_info = contact_details.get('phone')[0] or contact_details.get('email')[0]
 
+            shortlist.resume_file = resume_file
             shortlist.contact_details = contact_info 
             shortlist.resume_score = score
             shortlist.save()

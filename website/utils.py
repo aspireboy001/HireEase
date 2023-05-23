@@ -39,5 +39,6 @@ def extract_contact_details(resume_text):
     phone_pattern = r'\b(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\b'
     phone_matches = re.findall(phone_pattern, resume_text)
     contact_details['phone'] = ["".join(match) for match in phone_matches]
+    contact_details['phone'] = ["+" + phone_number for phone_number in contact_details['phone']]
 
     return contact_details
