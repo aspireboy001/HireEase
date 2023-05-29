@@ -32,9 +32,23 @@ class Resume(models.Model):
     belongs_to_recruiter = models.ForeignKey(Recruiter, on_delete=models.CASCADE)
     file = models.FileField(upload_to='resumes/')
 
+# class Shortlisted(models.Model):
+#     job_post = models.ForeignKey(Job, on_delete=models.CASCADE)
+#     resume_id = models.ForeignKey(Resume, on_delete=models.CASCADE)
+#     resume_score = models.DecimalField(max_digits=7, decimal_places=5,default=0)
+#     contact_details = models.CharField(max_length=100, blank=True, null=True)
+#     resume_file = models.FileField(upload_to='shortlisted_resumes/', null=True, blank=True)
+
+
 class Shortlisted(models.Model):
     job_post = models.ForeignKey(Job, on_delete=models.CASCADE)
     resume_id = models.ForeignKey(Resume, on_delete=models.CASCADE)
-    resume_score = models.DecimalField(max_digits=7, decimal_places=5,default=0)
-    contact_details = models.CharField(max_length=100, blank=True, null=True)
+    resume_score = models.DecimalField(max_digits=7, decimal_places=5, default=0)
+    email = models.CharField(max_length=254, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
     resume_file = models.FileField(upload_to='shortlisted_resumes/', null=True, blank=True)
+    Interview_Person = models.CharField(max_length=100,null=True,blank=True)
+    Date = models.DateField(null=True,blank=True)
+    Time = models.TimeField(null=True,blank=True)
+    Status = models.CharField(max_length=100,null=True,blank=True,default="Pending")
+    description = models.CharField(max_length=500,null=True,blank=True) 

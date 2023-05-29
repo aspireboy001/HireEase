@@ -1,16 +1,19 @@
 
 from django.urls import path,include
 from .views import *
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('',home,name='home'),
     path('about_us',about_us,name='about_us'),
-
+    
+    
     # Company_auth
     path('comp_reg',company_reg,name='company_reg'),
     path('comp_log',company_log,name='company_log'),
     path('comp_logout',company_logout,name='comp_logout'),
     path('comp_profile',company_profile,name='company_profile'),
+    path('download/resume/<path:filename>/', download_resume, name='download_resume'),
 
     # company_functional
     path('company_home',company_home,name='company_home'),
@@ -18,6 +21,7 @@ urlpatterns = [
     path('update_job_post/<int:job_post_id>',update_job_post,name='update_job_post'),
     path('view_responses/<int:job_post_id>',view_responses,name='view_responses'),
     path('my_posts',my_posts,name='my_posts'),
+
 
     # recruiter_auth
     path('rec_reg',recruiter_reg,name='recruiter_reg'),
@@ -35,3 +39,5 @@ urlpatterns = [
     path('send_resumes/<int:job_id>',send_resumes,name='send_resumes'),
     path('candidates_per_job',candidates_per_job,name='candidates_per_job'),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

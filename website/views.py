@@ -5,6 +5,16 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import make_password,check_password
 from django.db.models import Q
 from .utils import *
+from django.core.mail import send_mail, BadHeaderError
+from django.shortcuts import redirect, render
+from django.http import FileResponse, Http404
+from wsgiref.util import FileWrapper
+from django.conf import settings
+import os
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
 
 # Create your views here.
 def home(request):
@@ -70,8 +80,7 @@ def company_log(request):
 
 
 def company_logout(request):
-    if request.session.get('company_id'):
-        del request.session['company_id']
+    request.session.flush()
     return redirect('company_log')
 
 
@@ -204,26 +213,47 @@ def update_job_post(request,job_post_id):
 
 
 # //////////
-def view_responses(request,job_post_id):
+
+
+def view_responses(request, job_post_id):
     company_id = request.session.get('company_id')
     if not company_id:
         return redirect('company_login')
 
     company = get_object_or_404(Company, pk=company_id)
-
+    print(company.name)
     job_post = Job.objects.get(id=job_post_id, posted_by=company)
-    
+
     shortlisted_resumes = Shortlisted.objects.filter(job_post=job_post).order_by('-resume_score')[:job_post.number_of_openings]
 
+    
     context = {
-        'job_post':job_post,
-        'shortlisted_resumes':shortlisted_resumes,
+        'job_post': job_post,
+        'shortlisted_resumes': shortlisted_resumes,
     }
-    for i in shortlisted_resumes:
-        print(i.contact_details)
-    return render(request,'company_templates/responseToPosts.html',context)
 
+    if request.method == 'POST':
+            email = request.POST.get('email')
+            schedule =  get_object_or_404(Shortlisted, email=email)
+            print(schedule)
+            schedule.Interview_Person = request.POST.get('Iname')
+            schedule.Date = request.POST.get('date')
+            schedule.Time = request.POST.get('time')
+            schedule.description = request.POST.get('description')
+            schedule.Status = "Completed"
+            schedule.save()
+            #sending email
 
+            subject = 'Are You Ready For Next Round ?'
+            html_message = render_to_string('email.html', {'context_variable': {'date': schedule.Date, 'time': schedule.Time, 'description': schedule.description , 'comp_name':company.name}})
+
+            plain_message = strip_tags(html_message)
+            from_email = 'pccshireease@gmail.com'
+            to_email = [email, email]
+            send_mail(subject, plain_message, from_email, to_email, html_message=html_message)
+            messages.success(request, 'Further Round scheduled successfully')
+
+    return render(request, 'company_templates/responseToPosts.html', context)
 
 # Recruiter views
 def recruiter_reg(request):
@@ -281,8 +311,7 @@ def recruiter_log(request):
 
 
 def rec_logout(request):
-    if request.session.get('recruiter_id'):
-        del request.session['recruiter_id']
+    request.session.flush()
     return redirect('recruiter_log')
 
 
@@ -420,7 +449,7 @@ def send_resumes(request, job_id):
             resume_text = extract_text_from_pdf(resume_file)
             resume_skills = extract_skills(resume_text)
             contact_details = extract_contact_details(resume_text)
-            print(contact_details)
+            
             # Calculate the score
             common_skills = set(resume_skills).intersection(set(job_skills))
             score = len(common_skills) / len(job_skills)
@@ -428,13 +457,12 @@ def send_resumes(request, job_id):
             # Check if the resume has already been shortlisted
             shortlist, created = Shortlisted.objects.get_or_create(job_post=job, resume_id=resume)
 
-            contact_info = "Not Exist"
-            if contact_details:
-                contact_info = contact_details.get('phone')[0] or contact_details.get('email')[0]
-
             shortlist.resume_file = resume_file
-            shortlist.contact_details = contact_info 
             shortlist.resume_score = score
+            shortlist.email = contact_details.get('email')[0] ;
+            # print(contact_details.get('email')[0])
+            shortlist.phone_number = contact_details.get('phone')[0] ;
+            # print(contact_details.get('phone')[0])
             shortlist.save()
 
         messages.success(request, 'Resumes sent successfully')
@@ -456,3 +484,29 @@ def candidates_per_job(request):
         'shortlisted' : shortlisted_resumes,
     }
     return render(request, 'recruiter_templates/candidates_per_job.html',context)
+
+
+def download_resume(request, filename):
+    resume_path = os.path.join(settings.MEDIA_ROOT, 'resumes', filename)
+    if os.path.exists(resume_path):
+        file_wrapper = FileWrapper(open(resume_path, 'rb'))
+        response = FileResponse(file_wrapper, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(resume_path)
+        return response
+    else:
+        raise Http404("Resume not found")
+    
+
+
+# def email(request):
+#     subject = 'Subject of the Email'
+#     html_message = render_to_string('email.html', {'context_variable': 'Value'})
+#     plain_message = strip_tags(html_message)
+#     from_email = 'pccshireease@gmail.com'
+#     to_email = ['chetan.patil@mitaoe.ac.in', 'chetan.patil@mitaoe.ac.in']
+#     send_mail(subject, plain_message, from_email, to_email, html_message=html_message)
+#     return render(request,'landing_page.html')
+
+
+
+
