@@ -452,13 +452,17 @@ def send_resumes(request, job_id):
             
             # Calculate the score
             common_skills = set(resume_skills).intersection(set(job_skills))
-            score = len(common_skills) / len(job_skills)
+            score2 = extract_skills_with_score(resume_text,job.skills_required)
+            score2 = round(score2,3)
+            score = 0 
+            if len(job_skills) != 0 :
+                score = (len(common_skills) / len(job_skills)) * 100 
             
             # Check if the resume has already been shortlisted
             shortlist, created = Shortlisted.objects.get_or_create(job_post=job, resume_id=resume)
 
             shortlist.resume_file = resume_file
-            shortlist.resume_score = score
+            shortlist.resume_score = score2
             shortlist.email = contact_details.get('email')[0] ;
             # print(contact_details.get('email')[0])
             shortlist.phone_number = contact_details.get('phone')[0] ;

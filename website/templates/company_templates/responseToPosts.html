@@ -17,15 +17,18 @@
   position: fixed;
   bottom: 25%;
   right: 35%;
-  border: 3px solid #f1f1f1;
   z-index: 9;
 }
 
 /* Add styles to the form container */
 .form-container {
   width: 500px;
-  padding: 10px;
-  background-color: lightgrey;
+  padding: 5%;
+  background-color: rgb(176, 254, 241);
+  /* background-color: rgb(151, 195, 253); */
+  border: 4px solid black;
+  border-radius: 4%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
 }
 
     .resume-card {
@@ -58,6 +61,11 @@
       }
     }
 
+    .blur {
+      filter: blur(5px);
+      pointer-events: none;
+    }
+
   </style>
 {% endblock %}
 
@@ -75,7 +83,7 @@
 		{% endfor %}
 
   
-    <h1>Response to "{{ job_post.title }}"</h1>
+    <h1 id="TOP_HEADING">Response to "{{ job_post.title }}"</h1>
     <div class="row mt-4">
       {% for shortlisted_resume in shortlisted_resumes %}
         <div class="col-md-6">
@@ -104,7 +112,7 @@
           </div>
         </div>
 
-
+        {% comment %} schedular form  {% endcomment %}
         <div class="form-popup" id="myForm">
       
             <form action="" method="POST"  class="form-container">
@@ -114,25 +122,27 @@
             <label for="exampleInputEmail1">Interviewer Person :</label>
             <input type="text" class="form-control" name="Iname" placeholder="Enter HR Name" required>
           </div>
+
           <div class="form-group">
             <input type="hidden" class="form-control" name="email" id="formHeading">
           </div>
-          <div class="form-group">
-          <div class="row">
-            <div class="col-md-6">
-            <label for="exampleInputPassword1">Date :</label>
-            <input type="date" name="date" class="form-control" required>
-          </div>
-            <div class="col-md-6">
-            <label for="exampleInputPassword1">Time :</label>
-            <input type="time" name="time" class="form-control" required>
-          </div>
-          </div>
-          </div>
-          <div class="form-group">
-            <label for="exampleInputEmail1">Details About Interview :</label>
-            <textarea type="text" name="description" class="form-control" value="" placeholder="Enter Futher Details"></textarea>
-          </div>
+
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="exampleInputPassword1">Date :</label>
+                  <input type="date" name="date" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="exampleInputPassword1">Time :</label>
+                  <input type="time" name="time" class="form-control" required>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Details About Interview :</label>
+              <textarea type="text" name="description" class="form-control" value="" placeholder="Enter Futher Details"></textarea>
+            </div>
             <input type="hidden" id="hiddenField" name="email" value="SomeValue">
           
           <button type="submit" class="btn btn-primary">Submit</button>
@@ -151,17 +161,36 @@
   </div>
 
   <script>
+    
     function openForm(id) {
       document.getElementById("hiddenField").value = id;
       document.getElementById("formHeading").innerText = id;
+      var parentElement = document.querySelector("div.row.mt-4");
+      var elementsToBlur = Array.from(parentElement.children).filter(function(child) {
+        return child.id !== "myForm";
+      });
+      for (var i = 0; i < elementsToBlur.length; i++) {
+        elementsToBlur[i].classList.add("blur");
+      }
       document.getElementById("myForm").style.display = "block";
-      document.querySelector(".container").classList.add("blur");
+      document.getElementById("TOP_HEADING").classList.add("blur");
     }
     
     function closeForm() {
       document.getElementById("myForm").style.display = "none";
-      document.querySelector(".container").classList.remove("blur");
+      var parentElement = document.querySelector("div.row.mt-4");
+      var elementsToBlur = Array.from(parentElement.children).filter(function(child) {
+        return child.id !== "myForm";
+      });
+      for (var i = 0; i < elementsToBlur.length; i++) {
+        elementsToBlur[i].classList.remove("blur"); 
+      }
+      document.getElementById("TOP_HEADING").classList.remove("blur");
     }
+    
+    
+    
+
     
     </script>
 
