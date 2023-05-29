@@ -24,6 +24,19 @@
     .resume-card .resume-details {
       margin-top: 10px;
     }
+
+    @keyframes pulse {
+      0% {
+          opacity: 1;
+      }
+      50% {
+          opacity: 0.5;
+      }
+      100% {
+          opacity: 1;
+      }
+    }
+
   </style>
 {% endblock %}
 
@@ -36,15 +49,24 @@
           <div class="card resume-card">
             <div class="card-body">
               <h4 class="card-title">{{ shortlisted_resume.resume_id.name }}</h4>
-              <p class="card-text">Contact: </p>
+              <p class="card-text">Contact: {{shortlisted_resume.contact_details}} </p>
               <div class="resume-details">
                   <p>Score: {{ shortlisted_resume.resume_score }}</p>
+              </div>
+              <div class="text-right">
+                <a href="{{ shortlisted_resume.resume_file.url }}" class="btn btn-primary" download>Download Resume</a>
               </div>
             </div>
           </div>
         </div>
       {% endfor %}
     </div>
+
+    {% if shortlisted_resumes|length == 0 %}
+      <h3 class="alert alert-warning" style="animation: pulse 2s infinite;">No Data Here</h3>
+    {% endif %}
+
+
   </div>
 {% endblock %}
 

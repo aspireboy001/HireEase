@@ -36,3 +36,5 @@ class Shortlisted(models.Model):
     job_post = models.ForeignKey(Job, on_delete=models.CASCADE)
     resume_id = models.ForeignKey(Resume, on_delete=models.CASCADE)
     resume_score = models.DecimalField(max_digits=7, decimal_places=5,default=0)
+    contact_details = models.CharField(max_length=100, blank=True, null=True)
+    resume_file = models.FileField(upload_to='shortlisted_resumes/', null=True, blank=True)

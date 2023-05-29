@@ -219,6 +219,8 @@ def view_responses(request,job_post_id):
         'job_post':job_post,
         'shortlisted_resumes':shortlisted_resumes,
     }
+    for i in shortlisted_resumes:
+        print(i.contact_details)
     return render(request,'company_templates/responseToPosts.html',context)
 
 
@@ -417,7 +419,8 @@ def send_resumes(request, job_id):
             resume_file = resume.file.path
             resume_text = extract_text_from_pdf(resume_file)
             resume_skills = extract_skills(resume_text)
-            print(resume_skills)
+            contact_details = extract_contact_details(resume_text)
+            print(contact_details)
             # Calculate the score
             common_skills = set(resume_skills).intersection(set(job_skills))
             score = len(common_skills) / len(job_skills)
@@ -425,10 +428,14 @@ def send_resumes(request, job_id):
             # Check if the resume has already been shortlisted
             shortlist, created = Shortlisted.objects.get_or_create(job_post=job, resume_id=resume)
 
-            # Update the score if the resume has already been shortlisted
-            if not created:
-                shortlist.resume_score = score
-                shortlist.save()
+            contact_info = "Not Exist"
+            if contact_details:
+                contact_info = contact_details.get('phone')[0] or contact_details.get('email')[0]
+
+            shortlist.resume_file = resume_file
+            shortlist.contact_details = contact_info 
+            shortlist.resume_score = score
+            shortlist.save()
 
         messages.success(request, 'Resumes sent successfully')
         return redirect('job_detail', job_id=job_id)
